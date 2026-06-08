@@ -1,65 +1,86 @@
 import hashlib
+import time
 
-print("1. MD5")
-print("2. SHA1")
-print("3. SHA256")
-print("4. SHA512")
+print("=" * 40)
+print("PASSWORD HASH CRACKER")
+print("=" * 40)
 
-choice = input("Select the hashing algorithm (1-4): ")
+target_hash = input("\nEnter the hash to crack: ")
 
-attempts = 0
+hash_length = len(target_hash)
 
-if choice == '1':
-    algorithm = 'md5'
-elif choice == '2':
-    algorithm = 'sha1'
-elif choice == '3':
-    algorithm = 'sha256'
-elif choice == '4':
-    algorithm = 'sha512'
+if hash_length == 32:
+    algorithm = "md5"
+
+elif hash_length == 40:
+    algorithm = "sha1"
+
+elif hash_length == 64:
+    algorithm = "sha256"
+
+elif hash_length == 128:
+    algorithm = "sha512"
+
 else:
-    print("Invalid choice.")
+    print("Unknown hash type!")
     exit()
 
-print(f"Selected algorithm: {algorithm}")
+print(f"\nDetected Algorithm: {algorithm.upper()}")
 
-target_hash = input("Enter the hash to crack: ")
-print("Target Hash:", target_hash)
+with open("wordlist.txt", "r") as file:
+    wordlist = file.readlines()
 
-wordlist = [
-    "password",
-    "123456",
-    "12345678",
-    "qwerty",
-    "abc123",
-    "letmein",
-    "monkey",
-    "dragon",
-    "111111",
-    "baseball",
-    "hello",
-    "welcome",
-    "admin",
-    "login",
-    "cybersecurity",
-    "iloveyou"
-]
-
+attempts = 0
 found = False
+
+start_time = time.time()
 
 for word in wordlist:
 
+    word = word.strip()
+
+    attempts += 1
+
     hash_value = hashlib.new(
-        algorithm, 
+        algorithm,
         word.encode()
-        ).hexdigest()
-    
+    ).hexdigest()
+
     if hash_value == target_hash:
 
-        print(f"Password found: {word}")
+        end_time = time.time()
+
+        print("\n" + "=" * 40)
+        print("PASSWORD HASH CRACKER REPORT")
+        print("=" * 40)
+
+        print(f"Algorithm : {algorithm.upper()}")
+        print(f"Password  : {word}")
+        print(f"Attempts  : {attempts}")
+        print(
+            f"Time      : {end_time - start_time:.4f} seconds"
+        )
+        print("Status    : SUCCESS")
+
+        print("=" * 40)
+
         found = True
+
         break
 
-    if not found:
-        print("Password not found in the wordlist.")
+if not found:
 
+    end_time = time.time()
+
+    print("\n" + "=" * 40)
+    print("PASSWORD HASH CRACKER REPORT")
+    print("=" * 40)
+
+    print(f"Algorithm : {algorithm.upper()}")
+    print(f"Attempts  : {attempts}")
+    print(
+        f"Time      : {end_time - start_time:.4f} seconds"
+    )
+    print("Status    : PASSWORD NOT FOUND")
+
+    print("=" * 40)
